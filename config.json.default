@@ -1,0 +1,11 @@
+{
+    "server": "irc.example.com",
+    "port": 6667,
+    "nickname": "nickname",
+    "username": "username",
+    "realname": "realname",
+    "password": "password",
+    "apiKey": "apiKey",
+    "notifyUsers": ["notifyUsers1", "notifyUsers2"]
+  }
+  
