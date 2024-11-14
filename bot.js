@@ -108,7 +108,8 @@ client.on('join', async (event) => {
     console.log(`Security information for ${ipv4Address}:`, securityInfo);
 
     if (securityInfo.vpn || securityInfo.proxy || securityInfo.tor || securityInfo.relay) {
-      client.raw(`MODE ${event.channel} +q ${event.nick}`);
+      //client.raw(`MODE ${event.channel} +q ${event.nick}`);
+      client.say('ChanServ', `QUIET ${event.channel} ${event.nick}`);
         // Send a private message to each user in the notifyUsers array
         config.notifyUsers.forEach(user => {
             client.say(
