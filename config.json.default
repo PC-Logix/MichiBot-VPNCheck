@@ -7,6 +7,7 @@
     "password": "password",
     "apiKey": "apiKey",
     "notifyUsers": ["notifyUsers1", "notifyUsers2"],
-    "exemptUsers": ["TrustedUser1", "TrustedUser2"]
+    "exemptUsers": ["TrustedUser1", "TrustedUser2"],
+    "autoUpdate": true
   }
   

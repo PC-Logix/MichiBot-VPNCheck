@@ -1,3 +1,4 @@
+const { execSync } = require('child_process');
 const IRC = require('irc-framework');
 const fs = require('fs');
 const dns = require('dns').promises;
@@ -6,6 +7,31 @@ const CACHE_FILE = 'ip_cache.json';
 
 // Load configuration
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
+
+// Function to perform a git pull and check for updates
+function checkForUpdatesAndRestart() {
+  try {
+    console.log('Checking for updates...');
+    const output = execSync('git pull', { encoding: 'utf8' });
+
+    console.log(output);
+
+    if (!output.includes('Already up to date')) {
+      console.log('Updates detected, restarting the bot...');
+      process.exit(0); // Exit the process; assume a restart mechanism is in place
+    } else {
+      console.log('No updates found, continuing.');
+    }
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+  }
+}
+
+// Call the function at the start
+if (config.autoUpdate) {
+  checkForUpdatesAndRestart();
+}
 
 // Load cache file or initialize an empty cache
 let cache = {};
