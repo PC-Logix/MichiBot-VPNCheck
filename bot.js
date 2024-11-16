@@ -70,6 +70,12 @@ client.on('join', async (event) => {
     return;
   }
 
+  // Check if the user is in the exemptUsers list
+  if (config.exemptUsers.includes(event.nick)) {
+    console.log(`User ${event.nick} is exempt from checks.`);
+    return;
+  }
+
   const userHost = event.hostname;
 
   if (!userHost) {
