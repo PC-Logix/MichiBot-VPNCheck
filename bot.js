@@ -31,15 +31,16 @@ function saveCache() {
 }
 
 // Helper function to resolve hostname to IPv4
-async function resolveToIPv4(hostname) {
+async function resolveToIP(hostname) {
   try {
-    const addresses = await dns.resolve4(hostname);
-    return addresses[0];
+    const addresses = await dns.resolve(hostname); // Resolves both IPv4 and IPv6
+    return addresses[0]; // Use the first resolved IP
   } catch (error) {
-    console.error(`Failed to resolve ${hostname} to IPv4:`, error);
+    console.error(`Failed to resolve ${hostname} to an IP address:`, error);
     return null;
   }
 }
+
 
 // Helper function to query the VPN API
 async function queryVpnApi(ipv4Address) {
@@ -83,50 +84,47 @@ client.on('join', async (event) => {
     return;
   }
 
-  if (userHost.includes(':')) {
-    console.log(`User ${event.nick} has an IPv6 address, aborting process.`);
-    return;
-  }
+  let ipAddress = userHost;
 
-  let ipv4Address = userHost;
-
-  if (isNaN(parseInt(userHost.replace(/\./g, '')))) {
-    ipv4Address = await resolveToIPv4(userHost);
-    if (!ipv4Address) {
-      console.log(`No valid IPv4 address found for ${userHost}, aborting process.`);
+  // If it's a hostname, resolve to an IP address (IPv4 or IPv6)
+  if (isNaN(parseInt(userHost.replace(/[\.:]/g, '')))) {
+    ipAddress = await resolveToIP(userHost);
+    if (!ipAddress) {
+      console.log(`No valid IP address found for ${userHost}, aborting process.`);
       return;
     }
   }
 
-  console.log(`User ${event.nick} joined with IPv4 address: ${ipv4Address}`);
+  console.log(`User ${event.nick} joined with IP address: ${ipAddress}`);
 
   // Check if IP is in cache
-  let securityInfo = cache[ipv4Address];
+  let securityInfo = cache[ipAddress];
 
   if (!securityInfo) {
     // IP is not in cache, query the API
-    securityInfo = await queryVpnApi(ipv4Address);
+    securityInfo = await queryVpnApi(ipAddress);
   } else {
-    console.log(`Using cached security information for ${ipv4Address}`);
+    console.log(`Using cached security information for ${ipAddress}`);
   }
 
   if (securityInfo) {
-    console.log(`Security information for ${ipv4Address}:`, securityInfo);
+    console.log(`Security information for ${ipAddress}:`, securityInfo);
 
     if (securityInfo.vpn || securityInfo.proxy || securityInfo.tor || securityInfo.relay) {
-      //client.raw(`MODE ${event.channel} +q ${event.nick}`);
       client.say('ChanServ', `QUIET ${event.channel} ${event.nick}`);
-        // Send a private message to each user in the notifyUsers array
-        config.notifyUsers.forEach(user => {
-            client.say(
-            user,
-            `User ${event.nick} joined with IPv4 ${ipv4Address} and triggered a security flag: VPN=${securityInfo.vpn}, Proxy=${securityInfo.proxy}, Tor=${securityInfo.tor}, Relay=${securityInfo.relay}`
-            );
-        });
+
+      // Send a private message to each user in the notifyUsers array
+      config.notifyUsers.forEach(user => {
+        client.say(
+          user,
+          `User ${event.nick} joined with IP ${ipAddress} and triggered a security flag: VPN=${securityInfo.vpn}, Proxy=${securityInfo.proxy}, Tor=${securityInfo.tor}, Relay=${securityInfo.relay}`
+        );
+      });
     }
   } else {
-    console.log(`No security information available for ${ipv4Address}`);
+    console.log(`No security information available for ${ipAddress}`);
   }
+
 });
 
 client.on('message', (event) => {
