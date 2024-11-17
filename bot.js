@@ -177,11 +177,16 @@ client.on('message', (event) => {
   if (event.message === '!hello') {
     client.say(event.target, `Hello, ${event.nick}!`);
   } else if (event.message.trim() === '!exempted') {
-      // Join the list of exempt users into a string
-      const exemptList = config.exemptUsers.join(', ');
-  
-      // Send the list as a message to the channel or directly to the user
-      client.say(event.target, `Exempted users: ${exemptList || 'None'}`);
+    // Add a zero-width space in the middle of each username
+    const exemptList = config.exemptUsers
+      .map(user => {
+        const middle = Math.floor(user.length / 2);
+        return `${user.slice(0, middle)}\u200B${user.slice(middle)}`;
+      })
+      .join(', ');
+
+    // Send the list as a message to the channel or directly to the user
+    client.say(event.target, `Exempted users: ${exemptList || 'None'}`);
     }
 });
 
