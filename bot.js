@@ -8,16 +8,23 @@ const CACHE_FILE = 'ip_cache.json';
 // Load configuration
 let config = JSON.parse(fs.readFileSync('config.json', 'utf8')); // Change from const to let
 
+let reloadTimeout;
+
 fs.watch('config.json', (eventType) => {
   if (eventType === 'change') {
-    try {
-      console.log('Detected changes in config.json. Reloading configuration...');
-      config = JSON.parse(fs.readFileSync('config.json', 'utf8')); // Now reassignable
-    } catch (error) {
-      console.error('Error reloading config.json:', error);
-    }
+    clearTimeout(reloadTimeout); // Clear any existing timeout
+    reloadTimeout = setTimeout(() => {
+      try {
+        console.log('Detected changes in config.json. Reloading configuration...');
+        config = JSON.parse(fs.readFileSync('config.json', 'utf8')); // Safely reload config
+        console.log('Configuration reloaded successfully.');
+      } catch (error) {
+        console.error('Error reloading config.json:', error);
+      }
+    }, 100); // Wait 100ms to ensure the file is fully written
   }
 });
+
 
 // Function to perform a git pull and check for updates
 function checkForUpdatesAndRestart() {
