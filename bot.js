@@ -170,7 +170,13 @@ client.on('message', (event) => {
   // Respond to a specific command
   if (event.message === '!hello') {
     client.say(event.target, `Hello, ${event.nick}!`);
-  }
+  } else if (event.message.trim() === '!exempted') {
+      // Join the list of exempt users into a string
+      const exemptList = config.exemptUsers.join(', ');
+  
+      // Send the list as a message to the channel or directly to the user
+      client.say(event.target, `Exempted users: ${exemptList || 'None'}`);
+    }
 });
 
 client.on('error', (error) => {
