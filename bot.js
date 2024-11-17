@@ -8,6 +8,17 @@ const CACHE_FILE = 'ip_cache.json';
 // Load configuration
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+// Watch the config file for changes
+fs.watch('config.json', (eventType) => {
+  if (eventType === 'change') {
+    try {
+      console.log('Detected changes in config.json. Reloading configuration...');
+      config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+    } catch (error) {
+      console.error('Error reloading config.json:', error);
+    }
+  }
+});
 
 // Function to perform a git pull and check for updates
 function checkForUpdatesAndRestart() {
