@@ -6,14 +6,13 @@ const dns = require('dns').promises;
 const CACHE_FILE = 'ip_cache.json';
 
 // Load configuration
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+let config = JSON.parse(fs.readFileSync('config.json', 'utf8')); // Change from const to let
 
-// Watch the config file for changes
 fs.watch('config.json', (eventType) => {
   if (eventType === 'change') {
     try {
       console.log('Detected changes in config.json. Reloading configuration...');
-      config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+      config = JSON.parse(fs.readFileSync('config.json', 'utf8')); // Now reassignable
     } catch (error) {
       console.error('Error reloading config.json:', error);
     }
