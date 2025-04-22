@@ -115,7 +115,11 @@ client.on('join', async (event) => {
   }
 
 // Check if the user is in the exemptUsers list (case insensitive)
-if (config.exemptUsers.some(user => user.toLowerCase() === event.nick.toLowerCase())) {
+if (config.exemptUsers.some(user => {
+  const lowerUser = user.toLowerCase();
+  const lowerNick = event.nick.toLowerCase();
+  return lowerUser === lowerNick || (lowerUser + '_') === lowerNick;
+})) {
   console.log(`User ${event.nick} is exempt from checks.`);
   return;
 }
