@@ -178,11 +178,17 @@ if (config.exemptUsers.some(user => {
 client.on('message', (event) => {
   console.log(`Message from ${event.nick}: ${event.message}`);
 
-  // Respond to a specific command
   if (event.message === '!hello') {
-    client.say(event.target, `Hello, ${event.nick}!`);
+    let gitHash = '';
+    try {
+      gitHash = execSync('git rev-parse --short HEAD').toString().trim();
+    } catch (err) {
+      gitHash = 'unknown';
+    }
+
+    client.say(event.target, `Hello, ${event.nick}! Git hash: ${gitHash}`);
+  
   } else if (event.message.trim() === '!exempted') {
-    // Add a zero-width space in the middle of each username
     const exemptList = config.exemptUsers
       .map(user => {
         const middle = Math.floor(user.length / 2);
@@ -190,9 +196,8 @@ client.on('message', (event) => {
       })
       .join(', ');
 
-    // Send the list as a message to the channel or directly to the user
     client.say(event.target, `Exempted users: ${exemptList || 'None'}`);
-    }
+  }
 });
 
 client.on('error', (error) => {
